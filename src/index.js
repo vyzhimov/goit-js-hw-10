@@ -10,23 +10,23 @@ const refs = {
   countryInfo: document.querySelector('.country-info'),
 };
 
-refs.input.addEventListener(
-  'input',
-  debounce(e => {
-    if (refs.input.value === '') {
-      markupReset();
-      return;
-    }
+refs.input.addEventListener('input', debounce(onInputSearch, DEBOUNCE_DELAY));
+
+function onInputSearch(e) {
+  if (e.target.value === '') {
     markupReset();
-    console.log(e);
-    let country = e.target.value.trim();
-    fetchCountries(country)
-      .then(renderCountryMarkup)
-      .catch(error =>
-        Notiflix.Notify.failure('Oops, there is no country with that name')
-      );
-  }, DEBOUNCE_DELAY)
-);
+    return;
+  }
+  markupReset();
+  console.log(e.target);
+  console.log(e.currentTarget);
+  let country = e.target.value.trim();
+  fetchCountries(country)
+    .then(renderCountryMarkup)
+    .catch(error =>
+      Notiflix.Notify.failure('Oops, there is no country with that name')
+    );
+}
 
 function renderCountryMarkup(arr) {
   if (arr.length > 10) {
