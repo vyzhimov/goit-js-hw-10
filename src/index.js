@@ -12,13 +12,14 @@ const refs = {
 
 refs.input.addEventListener(
   'input',
-  debounce(() => {
+  debounce(e => {
     if (refs.input.value === '') {
       markupReset();
       return;
     }
     markupReset();
-    let country = refs.input.value.trim();
+    console.log(e);
+    let country = e.target.value.trim();
     fetchCountries(country)
       .then(renderCountryMarkup)
       .catch(error =>
