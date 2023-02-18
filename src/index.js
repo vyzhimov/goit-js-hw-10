@@ -14,12 +14,10 @@ refs.input.addEventListener(
   'input',
   debounce(() => {
     if (refs.input.value === '') {
-      refs.countryInfo.innerHTML = '';
-      refs.countryList.innerHTML = '';
+      markupReset();
       return;
     }
-    refs.countryInfo.innerHTML = '';
-    refs.countryList.innerHTML = '';
+    markupReset();
     let country = refs.input.value.trim();
     fetchCountries(country)
       .then(renderCountryMarkup)
@@ -41,8 +39,8 @@ function renderCountryMarkup(arr) {
     });
     refs.countryList.innerHTML = markup;
   } else if (arr.length === 1) {
-    let countryNameMarkup = `<li style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; font-weight: 700; font-size: 30px" ><img src="${arr[0].flags.svg}" width="30" height="25"></img>${arr[0].name.official}</li>`;
-    let countryInfoMarkup = `<p style="font-weight: 500;"><strong>Capital:</strong> ${
+    const countryNameMarkup = `<li style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; font-weight: 700; font-size: 30px" ><img src="${arr[0].flags.svg}" width="30" height="25"></img>${arr[0].name.official}</li>`;
+    const countryInfoMarkup = `<p style="font-weight: 500;"><strong>Capital:</strong> ${
       arr[0].capital
     }</p><p style="font-weight: 500;"><strong>Population:</strong> ${
       arr[0].population
@@ -52,6 +50,11 @@ function renderCountryMarkup(arr) {
     refs.countryList.innerHTML = countryNameMarkup;
     refs.countryInfo.innerHTML = countryInfoMarkup;
   }
+}
+
+function markupReset() {
+  refs.countryInfo.innerHTML = '';
+  refs.countryList.innerHTML = '';
 }
 
 refs.input.setAttribute('style', 'margin-bottom: 0');
