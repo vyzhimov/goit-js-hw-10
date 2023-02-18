@@ -18,9 +18,7 @@ function onInputSearch(e) {
     return;
   }
   markupReset();
-  console.log(e.target);
-  console.log(e.currentTarget);
-  let country = e.target.value.trim();
+  const country = e.target.value.trim();
   fetchCountries(country)
     .then(renderCountryMarkup)
     .catch(error =>
