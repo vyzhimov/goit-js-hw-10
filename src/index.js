@@ -1,6 +1,7 @@
 import './css/styles.css';
 import debounce from 'lodash.debounce';
 import Notiflix from 'notiflix';
+import { fetchCountries } from './fetchCountries';
 
 const DEBOUNCE_DELAY = 300;
 const refs = {
@@ -12,22 +13,23 @@ const refs = {
 refs.input.addEventListener(
   'input',
   debounce(() => {
+    if (refs.input.value === '') {
+      refs.countryInfo.innerHTML = '';
+      refs.countryList.innerHTML = '';
+      return;
+    }
+    refs.countryInfo.innerHTML = '';
+    refs.countryList.innerHTML = '';
     let country = refs.input.value.trim();
-    fetchCountries(country);
+    fetchCountries(country)
+      .then(renderCountryMarkup)
+      .catch(error =>
+        Notiflix.Notify.failure('Oops, there is no country with that name')
+      );
   }, DEBOUNCE_DELAY)
 );
 
-function fetchCountries(countryName) {
-  fetch(
-    `https://restcountries.com/v3.1/name/${countryName}?fields=name,capital,population,flags,languages`
-  )
-    .then(r => r.json())
-    .then(renderCountryMarkup);
-}
-
 function renderCountryMarkup(arr) {
-  refs.countryInfo.innerHTML = '';
-  refs.countryList.innerHTML = '';
   if (arr.length > 10) {
     Notiflix.Notify.info(
       'Too many matches found. Please enter a more specific name.'
@@ -35,15 +37,22 @@ function renderCountryMarkup(arr) {
   } else if (arr.length > 2 && arr.length < 10) {
     let markup = '';
     arr.map(item => {
-      return (markup += `<li class="country_item"><img class="img_country" src="${item.flags.svg}" alt='${item.name.official}' width='25' height='20'></img>${item.name.official}</li>`);
+      return (markup += `<li style="display: flex; gap: 15px; margin-bottom: 5px; font-weight: 500" ><img class="img_country" src="${item.flags.svg}" alt='${item.name.official}' width='30' height='25'></img>${item.name.official}</li>`);
     });
     refs.countryList.innerHTML = markup;
-  } else {
-    let countryNameMarkup = `<li>${arr[0].name.official}</li>`;
-    let countryInfoMarkup = `<p>Capital: ${arr[0].capital}</p>Population: ${
+  } else if (arr.length === 1) {
+    let countryNameMarkup = `<li style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; font-weight: 700; font-size: 30px" ><img src="${arr[0].flags.svg}" width="30" height="25"></img>${arr[0].name.official}</li>`;
+    let countryInfoMarkup = `<p style="font-weight: 500;"><strong>Capital:</strong> ${
+      arr[0].capital
+    }</p><p style="font-weight: 500;"><strong>Population:</strong> ${
       arr[0].population
-    }</p></p>Languages: ${Object.values(arr[0].languages)}</p>`;
+    }</p><p style="font-weight: 500;"><strong>Languages:</strong> ${Object.values(
+      arr[0].languages
+    )}</p>`;
     refs.countryList.innerHTML = countryNameMarkup;
     refs.countryInfo.innerHTML = countryInfoMarkup;
   }
 }
+
+refs.input.setAttribute('style', 'margin-bottom: 0');
+refs.countryList.setAttribute('style', 'list-style: none; padding-left: 0px');
